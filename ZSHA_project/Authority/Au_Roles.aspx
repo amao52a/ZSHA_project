@@ -59,7 +59,7 @@
 
     <input id="RoleMenuId" type="hidden"/>
 
-    <div id="m" class="easyui-window" title="选择系统和菜单权限" data-options="iconCls:'icon-save',closed:true" style="width:400px;height:500px;padding:10px;">
+    <div id="m" class="easyui-window" title="选择系统和菜单权限" data-options="iconCls:'icon-save',closed:true" style="width:600px;height:500px;padding:10px;">
 		<div id="selectMenu">
         </div>
         <div style="float:right">
@@ -243,67 +243,128 @@
 
     //选择菜单和系统权限
     function selectMenus(id) {
+        var _menus={};
         $('#m').window('open');
-        $('#selectMenu').tree({
+        $('#selectMenu').treegrid({
             animate: true,
             checkbox: true,
-            cascadeCheck:false,
+            fitColumns: 'true',
+            checkOnSelect: 'true',
+            selectOnCheck:'true',
+            striped: true,
             url: '../Ashx/Authority/Au_RoleMenus.ashx?type=menu',
-            onClick: function (node) {
-                if (node.checkState=="unchecked") {
-                    $('#selectMenu').tree("check", node.target);
-                } else {
-                    $('#selectMenu').tree("uncheck", node.target);
+            method: 'post',
+            idField:'id',//根据那个字段判断树节点关系
+            treeField:'text',//根据那个列展现树
+            columns:[[
+                    {title:'菜单名称',field:'text',width:200},
+                {
+                    title: '菜单相应权限', field: 'attributes', width: 345, formatter: function (value, row, index) {
+                        var checkbox = "";
+                        if (!row.children) {
+                             $.each(value, function (i, n) {
+                                checkbox += "<input type='checkbox' value="+n.authority+" />"+n.authorityname+"";
+                             });
+                        }
+                        return checkbox;
+                    }
                 }
-            },
+            ]],
             onLoadSuccess: function () {
-                //获取之前已经选择的菜单ID
+                $('#RoleMenuId').val(id);
+                //取消所有的勾选状态，初始化
+                if (!$(".tree-checkbox").hasClass("tree-checkbox0")) {
+                    $(".tree-checkbox").removeClass("tree-checkbox1");
+                    $(".tree-checkbox").removeClass("tree-checkbox2");
+                    $(".tree-checkbox").addClass("tree-checkbox0");
+                }
+                //设置chechbox单选
+                $("tr[node-id]").each(function () {
+                    $(this).find("input:checkbox").click(function () {
+                        if ($(this).prop('checked')) {
+                            $(this).siblings().prop("checked", false);
+                            if (!$(this).parent().parent().prev().find(".tree-checkbox").hasClass("tree-checkbox1")) {
+                                $(this).parent().parent().prev().find(".tree-checkbox").addClass("tree-checkbox1");
+                            }
+                        } 
+                    })
+                });
+                //勾选已经选择过的checkbox
                 $.post("../Ashx/Authority/Au_RoleMenus.ashx?type=checkMenu",
                     { RoleId: id },
                     function (data, status) {
                         if (status == 'success') {
-                            if (data != "") {
-                                var menuid = data.split(",");
-                                for (var i = 0; i < menuid.length; i++) {
-                                    var node=$('#selectMenu').tree("find",menuid[i]);
-                                    $('#selectMenu').tree("check",node.target);
-                                }
+                            if (data.length>1) {
+                                _menus = jQuery.parseJSON(data);
+                                $.each(_menus, function (i, n) {
+                                    //菜单勾选
+                                    if (n.authority>0) {
+                                        var node = $("tr[node-id='" + n.menuid + "']").find(".tree-checkbox");
+                                        node.removeClass("tree-checkbox0");
+                                        node.addClass("tree-checkbox1");
+                                         //权限勾选
+                                        var authority = $("tr[node-id='" + n.menuid + "']").find("input:checkbox");
+                                        authority.each(function () {
+                                            var check = $(this).val();
+                                            if ( parseInt(n.authority & check ) == check) {
+                                                $(this).prop('checked','checked');
+                                            }
+                                        });
+                                    } else {
+                                        var node = $("tr[node-id='" + n.menuid + "']").find(".tree-checkbox");
+                                        node.removeClass("tree-checkbox0");
+                                        node.addClass("tree-checkbox2");
+                                    }
+                                 });
                             }
                         } else {
-                            $.messager.alert('提示', "用户获取失败，请联系管理员", 'info');
+                            $.messager.alert('提示', "权限获取失败，请联系管理员", 'info');
                         }
                     }
                 );
-                $('#RoleMenuId').val(id);
+               
             }
         });
     }
 
     //保存菜单和系统权限
     function saveRoleMenu() {
-        var node = $('#selectMenu').tree('getChecked',  ['checked','indeterminate']);
-        if (node.length==0) {
-            $.messager.alert("提示", "请先选择用户！", "info");
-            return;
-        }
-        var menuids = "";
-        var systemids = "";
-        for (var i = 0; i < node.length;i++) {
-            menuids += node[i].id + ",";
-            systemids += node[i].attributes + ",";
-        }
-        $.post(
-            "../Ashx/Authority/Au_RoleMenus.ashx?type=saveMenu",
-            { menuids: menuids,roleid:$('#RoleMenuId').val(),systemids:systemids },
-            function (data, status) {
-                if (status == 'success') {
-                    $.messager.alert('提示', data, 'info');
-                    $('#m').window('close');
-                } else {
-                    $.messager.alert('提示', data, 'info');
+        var menuids = new Array();
+        var systemids = new Array();
+        var authoritys = new Array();
+        $(".tree-checkbox1").each(function () {
+            var node=$(this).closest("tr");
+            var nodeid = node.attr("node-id");
+            var authority = 0;
+            var check = node.find("td[field='attributes']").find("input:checkbox");
+            check.each(function () {
+                if ($(this).prop('checked')) {
+                    authority += parseInt($(this).val());
                 }
+            });
+            var n=$('#selectMenu').treegrid('find',nodeid);
+            menuids.push(nodeid);
+            authoritys.push(authority);
+            systemids.push(n.systemid);
+        });
+        $(".tree-checkbox2").each(function () {
+            var nodeid=$(this).closest("tr").attr("node-id")
+            menuids.push(nodeid);
+            authoritys.push(0);
+            var n=$('#selectMenu').treegrid('find',nodeid);
+            systemids.push(n.systemid);
+        });
+        $.ajax({
+            url: "../Ashx/Authority/Au_RoleMenus.ashx?type=saveMenu",
+            data: { menuids: menuids, roleid: $('#RoleMenuId').val(), systemids: systemids, authoritys: authoritys },
+            contentType: 'application/x-www-form-urlencoded',
+            type: 'post',
+            traditional: 'true',
+            success: function (result)  {
+                 $.messager.alert('提示', result, 'info');
+                 $('#m').window('close');
             }
-        );
+        });
     }
 </script>
 </html>
