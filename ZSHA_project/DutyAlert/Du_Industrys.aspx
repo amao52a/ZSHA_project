@@ -28,12 +28,40 @@
             <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true"  onclick="toadd()">新增</a>
             <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true"  onclick="toedit()">编辑</a>
             <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true"  onclick="toremove()">删除</a>
-            行业名称：<input type="text" id="s_name" name="s_name" /><input type="hidden" name="s_id" id="s_id" value="0"/>
+            行业名称：<input type="text" id="s_name" name="s_name" /><input type="hidden" name="s_id" id="s_id"  />
             <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true"  onclick="tosearch('search')">查询</a>
         </div>
         <div id="tt">
 
         </div>
+    </div>
+
+    <div id="dlg" class="easyui-dialog" title="新建单位" data-options="iconCls:'icon-save',closed:true, buttons:'#dlg-buttons'"  
+        style="width:600px;height:300px;padding:10px ">
+		 <form id="fm" method="post">
+            <table>
+                <tr>
+                    <td><label>行业名称：</label></td>
+                    <td><input id="Names" name="Names" class="easyui-textbox" data-options="required:true"   />
+                        <input id="id" name="id" type="hidden" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>行业代码：</label></td>
+                    <td><input id="Numbers" name="Numbers" class="easyui-textbox" data-options="required:true"   />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>行政区划：</label></td>
+                    <td><input id="Areas_Numbers" name="Areas_Numbers" class="easyui-textbox" data-options="required:true,readonly:true"   />
+                    </td>
+                </tr>
+            </table>
+        </form>
+	</div>
+    <div id="dlg-buttons">
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" onclick="save()">保存</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" onclick="javascript:$('#dlg').dialog('close')">关闭</a>
     </div>
 
 </body>
@@ -48,7 +76,8 @@
                 param.fid = $("#Provinces").combotree("getValue");                
             },
             onClick: function (node) {
-                
+                $("#s_id").val(node.attributes);
+                tosearch("search");
             },
             onLoadSuccess: function (node, data) {
                 $("#tree").tree("collapseAll");  
@@ -57,12 +86,12 @@
 
         //加载列表
         $('#tt').datagrid({
-            url: "../Ashx/Authority/Au_Units.ashx",
+            url: "../Ashx/DutyAlert/Du_Industrys.ashx",
             toolbar: "#tb",
             queryParams: {
                 type: "search",
                 name: $("#s_name").val(),
-                id:$("#s_id").val()
+                a_number:$("#s_id").val()
             },
 			fitColumns : "true",
             striped: true,
@@ -71,15 +100,13 @@
             checkOnSelect: 'true',
             singleSelect : true,
             pagination : true,
-            pageSize : 20,
-            pageList : [ 10, 20, 30, 40, 50 ],
+            pageSize : 15,
+            pageList : [ 10, 15, 30, 40, 50 ],
             columns: [[
                 { field: 'id', checkbox: true, },
-                { field: 'UnitName', title: '单位名称', width: 100, align: 'center' },
-                { field: 'UnitCode', title: '统一编码', width: 100, align: 'center' },
-                { field: 'Legal', title: '法人代表', width: 100, align: 'center' },
-                { field: 'Contacts', title: '联系人', width: 100, align: 'center' },
-                { field: 'ContactMethod', title: '联系方法', width: 100, align: 'center' }
+                { field: 'Numbers', title: '行政代码', width: 100, align: 'center' },
+                { field: 'Areas_Numbers', title: '行政区划', width: 100, align: 'center' },
+                { field: 'Names', title: '行业名称', width: 100, align: 'center' }
             ]]
         });
 
@@ -92,5 +119,88 @@
         });
 
     });
+
+
+     //监听回车
+    $(document).keyup(function(event){
+        if(event.keyCode ==13){
+            tosearch("search");
+        }
+    });
+
+    //查询
+    function tosearch(type) {
+        var queryParams = $('#tt').datagrid('options').queryParams;
+        queryParams.name = $('#s_name').val();
+        queryParams.a_number = $('#s_id').val();
+        queryParams.type = type;
+        $("#tt").datagrid('reload');
+    }
+
+    function toadd() {
+        //清除表单元素的值
+        $("#fm").form('clear');
+        var node = $('#tree').tree("getSelected");
+        $("#Areas_Numbers").textbox("setValue", node.attributes);
+        $("#dlg").dialog({ title: "新建行业" });
+        $("#dlg").dialog('open');
+    }
+
+    //修改
+    function toedit() {
+        var row = $('#tt').datagrid('getSelected');
+        if (null == row) {
+            $.messager.alert("提示", "请选择要编辑的行！", "info");
+            return;
+        }
+        $("#fm").form('clear');
+        $('#fm').form('load', row);
+        $("#dlg").dialog({ title: "编辑行业" });
+        $("#dlg").dialog('open');
+    }
+
+    //保存数据
+    function save() {
+        $('#fm').form('submit', {
+            url: "../Ashx/DutyAlert/Du_Industrys.ashx?type=save",
+			onSubmit:function(){
+			    return $(this).form('validate');
+            },
+            success: function (data) {
+                $.messager.alert('提示', data, 'info');
+                $("#dlg").dialog('close');
+                tosearch("search");
+                
+             }
+		});
+    }
+
+    //删除
+    function toremove() {
+        var row = $('#tt').datagrid('getSelected');
+        if (null == row) {
+            $.messager.alert("提示", "请选择要删除的行！", "info");
+            return;
+        }
+        $.messager.confirm('确认删除', '是否要删除所选记录?', function(r){
+			if (r){
+                $.post(
+                    "../Ashx/DutyAlert/Du_Industrys.ashx?type=remove",
+                    { id: row.id},
+                    function (data, status) {
+                        if (status == 'success') {
+                            $.messager.alert('提示', data, 'info');
+                            tosearch("search");
+                        } else {
+                            $.messager.alert('提示', data, 'info');
+                        }
+                    }
+                );
+			}
+		});
+    }
+
+
+
 </script>
 </html>
