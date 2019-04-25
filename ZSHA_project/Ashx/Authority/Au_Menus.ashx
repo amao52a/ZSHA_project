@@ -13,7 +13,6 @@ public class Au_Menus : IHttpHandler {
 
     public void ProcessRequest (HttpContext context) {
         context.Response.ContentType = "text/plain";
-        context.Response.ContentType = "text/plain";
         context.Request.ContentEncoding = Encoding.GetEncoding("utf-8"); //必须加上，否则会产生乱码
         type_str=context.Request.Params["type"];
         switch (type_str)
@@ -90,6 +89,7 @@ public class Au_Menus : IHttpHandler {
         return result.ToString();
     }
     #endregion 
+
     //保存方法
     public void Menusave(HttpContext context)
     {
