@@ -1,0 +1,169 @@
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 3px;
+    border-top: 0px solid #ddd;
+        vertical-align: middle;
+}
+
+.table {
+    margin-bottom: 1px;
+}
+/* 报表部分table */
+.table_sbb  {
+}
+
+.form-control{
+	height:30px;
+	padding:3px 3px;
+}
+
+.form-control[disabled]{
+     cursor: default ;
+}
+
+/* 报表的底部文字描述*/
+.table_footer{
+	
+}
+.table_footer td{
+border: 0px solid transparent !important;
+}
+
+/*申报表的标题*/
+.table_head{
+	text-align:center;
+}
+.table_head b{
+    font-size :20px;	
+}
+.table_head td{
+border: 0px solid transparent !important;
+}
+
+/*  属期，识别号之类*/
+.table_head2{
+}
+.table_head2 td{
+border: 0px solid transparent !important;
+}
+
+.wbktd {
+	border: 0px;
+}
+
+/* 报表上的申报项目的标题，第一行*/
+.table_td_title{
+	text-align:center;
+}
+
+/* 报表左边的项目描述*/
+.table_td_bd{
+	text-align:left;
+	/*background-color:#DFDFDF;*/
+}
+
+/* 报表的行次列*/
+.table_td_hc{
+	text-align: center;
+}
+.top-line-right {
+    width: auto;
+    height: 30px;
+    line-height: 30px;
+    float: right;
+    margin-right: 70px;
+    font-size: 14px;
+    right: 10px;
+}
+
+.top-line-right ul,.top-line-right li {
+    padding: 0px;
+    margin: 0px;
+}
+
+.top-line-right li {
+    height: 30px;
+    line-height:30px;
+    float: left;
+    display: inline-block;
+}
+
+.top-line-right a{
+	FONT-SIZE: 12px;
+    width: 92px;
+    height: 30px;
+    line-height: 30px;
+    display: block;
+	padding-left: 30px;
+    text-decoration: none;
+    text-align:center;
+    color: #ffffff;
+    border-left: 1px solid #ffffff;
+}
+
+.top-line-right a:hover{
+	 background-color: rgb(26, 85, 169); 
+}
+
+.top-line-btn-sm a {
+    background-image: url(../images/bdlb_tbsm.png);
+    background-repeat: no-repeat;
+	padding-right: 12px;
+	background-position: left center; 
+}
+
+.top-line-btn-xg a {
+    background-image: url(../images/bdlb_xg.png);
+    background-repeat: no-repeat;
+	padding-right: 12px;
+	background-position: left center; 
+}
+
+.top-line-btn-zf a {
+    background-image: url(../images/bdlb_zf.png);
+    background-repeat: no-repeat;
+	padding-right: 20px;
+	background-position: left center; 
+}
+
+.top-line-btn-dy a {
+    background-image: url(../images/bdlb_dy.png);
+    background-repeat: no-repeat;
+	padding-right: 20px;
+	background-position: left center; 
+}
+
+.top-line-btn-fh a {
+    background-image: url(../images/bdlb_fh.png);
+    background-repeat: no-repeat;
+	padding-right: 20px;
+	background-position: left center; 
+}
+
+.top-line-btn-qz a {
+    background-image: url(../images/bdlb_qz.png);
+    background-repeat: no-repeat;
+	padding-right: 20px;
+	background-position: left center; 
+}
+.bdmenudiv{
+  background-color: #337ab7;
+  height: 30px;
+}
+.bt_cls{
+font-size: large;
+color: rgb(128, 0, 0);
+margin:20px;
+}
+.nr_cls{
+font-size: 3;
+}
+.btn-primary{
+	margin-right:5px;
+}
+	.span_sx{
+		    background: url(../images/bdlb_xg.png);
+		    background-repeat: no-repeat;
+			padding-right: 12px;
+			background-position: left center; 
+			width: 150px;
+	}

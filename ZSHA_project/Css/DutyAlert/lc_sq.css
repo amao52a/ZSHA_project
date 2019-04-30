@@ -1,0 +1,35 @@
+*{
+	font-size:13px;
+}
+		
+body{
+    zoom:100%;
+}
+.lc_table input {
+	font-size: 12px;
+	BORDER: 0px;
+	text-align: right;
+	background-color: white;
+	width:96%;
+	height:98%;
+}
+
+.lc_table {
+	BORDER-RIGHT: #000000 1px solid; 
+    BORDER-TOP: #000000 1px solid; 
+    BORDER-LEFT: #000000 1px solid;  
+    BORDER-BOTTOM: #000000 1px solid; 
+	border-collapse: collapse;
+	margin-bottom:10px;
+}
+.lc_table TD {
+	border: 1px solid #000000;
+}
+.lc_table TR {
+	height: 20px;
+}
+.bttd {
+	background-color: #F7F7F7;
+}
+
+
