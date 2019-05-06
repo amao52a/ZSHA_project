@@ -41,4 +41,10 @@ public partial class DutyAlert_Du_Python : System.Web.UI.Page
         //var CustomerData = _func(1, 2);
         Response.Write(CustomerData);
     }
+
+    protected void Button2_Click(object sender, EventArgs e)
+    {
+        string a = "01";
+        Response.Write(int.Parse(a));
+    }
 }

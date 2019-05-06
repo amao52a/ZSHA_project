@@ -12,7 +12,7 @@
     <title>职工薪酬纳税调整明细表</title>
 </head>
 <body>
-    <div id="dy_div">
+  <div id="dy_div">
   <input type="hidden" id="bblx" value="SB_SDS_JMCZ_14ND_ZGXCNSTZMXB">
   <table border="0" width="820" align="center">
     <tbody><tr><td colspan="3" width="100%" align="left">A105050</td></tr>
@@ -24,7 +24,7 @@
   <table width="820" border="0" align="center">
     <tbody><tr>
       <td width="33%" align="center">&nbsp;</td>
-      <td width="33%" align="center">填报时间：<span id="rq">2018-05-27</span></td>
+      <td width="33%" align="center">所属时间：<span id="rq"><%=year%></span></td>
       <td width="34%" align="right">金额单位：元（列至角分）</td>
     </tr>
   </tbody></table>

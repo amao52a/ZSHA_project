@@ -23,7 +23,7 @@
 			</tr>
 			<tr>
 				<td width="33%" align="center">&nbsp;</td>
-				<td width="33%" align="center">填报时间：<span id="rq">2018-05-27</span></td>
+				<td width="33%" align="center">所属时间：<span id="rq"><%=year%></span></td>
 				<td width="34%" align="right">金额单位：元（列至角分）</td>
 			</tr>
 		</tbody></table>

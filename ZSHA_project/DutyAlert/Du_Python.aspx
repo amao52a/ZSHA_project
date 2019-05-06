@@ -11,6 +11,7 @@
     <form id="form1" runat="server">
         <div>
             <asp:Button ID="Button1" runat="server" Text="测试接口" OnClick="Button1_Click" />
+            <asp:Button ID="Button2" runat="server" Text="测试HTTP" OnClick="Button2_Click" />
         </div>
     </form>
 </body>
