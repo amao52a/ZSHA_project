@@ -9,11 +9,12 @@
     <link href="../Css/DutyAlert/funcmenu_nssb.css" rel="stylesheet" />
     <link href="../Css/DutyAlert/lc_sq.css" rel="stylesheet" />
     <link href="../Css/DutyAlert/zkpub.css" rel="stylesheet" />
+    <script type="text/javascript" src="../Js/jquery-3.3.1.min.js"></script>
     <title>期间费用明细表</title>
 </head>
 <body>
     <div id="dy_div">
-	<form name="form1" method="post">
+	<form id="fm">
 		<table width="700" align="center">
 			<tbody><tr>
 				<td colspan="3" width="100%" align="left">A104000</td>
@@ -27,6 +28,8 @@
 				<td width="34%" align="right">金额单位：元（列至角分）</td>
 			</tr>
 		</tbody></table>
+        <input id="year" name="year" type="hidden" value="<%=year %>"/>
+        <input id="companysnumbers" name="companysnumbers" type="hidden" value="<%=companysnumbers %>"/>
 		<table width="700" border="1" cellspacing="0" cellpadding="0" bordercolorlight="#000000" bordercolordark="#FFFFFF" align="center" class="lc_table">
 			<tbody><tr>
 				<td rowspan="2" align="center" class="bttd" style="width: 30px">行次</td>
@@ -308,7 +311,24 @@
 			</tr>
 		</tbody></table>
 	</form>
+        <div align="center"><button  onclick="saveTax()">提交</button></div>
 </div>
 
 </body>
+<script type="text/javascript">
+    function saveTax() {
+        $.ajax({
+            url: "../Ashx/DutyAlert/Du_A104000.ashx",
+            contentType: 'application/x-www-form-urlencoded',
+            type: 'POST',
+            data: $('#fm').serialize(),
+            success: function (rs) {
+                alert("保存成功！");
+            },
+            error: function () {
+                alert("保存失败，请联系管理员！");
+            }
+        });
+    }
+</script>
 </html>

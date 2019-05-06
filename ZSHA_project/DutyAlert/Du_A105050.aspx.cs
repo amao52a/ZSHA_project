@@ -7,10 +7,11 @@ using System.Web.UI.WebControls;
 
 public partial class DutyAlert_Du_A105050 : System.Web.UI.Page
 {
-    public string year = "";
+    public string year = "", companysnumbers = "";
     protected void Page_Load(object sender, EventArgs e)
     {
         year = Request.Params["year"];
+        companysnumbers = Request.Params["companysnumbers"];
         if (string.IsNullOrEmpty(year))
         {
             DateTime dt = DateTime.Now;
