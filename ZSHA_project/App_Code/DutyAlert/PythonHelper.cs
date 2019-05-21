@@ -38,7 +38,7 @@ public class PythonHelper
         request.ContentType = "application/x-www-form-urlencoded;charset=utf-8";
         //使用utf-8格式组装post参数
         string data = "username="+ username + "&pwd="+pwd+"&sssq_q="+ sssq_q + "&sssq_z="+ sssq_z+ "&zsxm_dm="+ zsxm_dm + "";
-        byte[] postData =Encoding.Default.GetBytes(data);
+        byte[] postData =Encoding.UTF8.GetBytes(data);
         Stream reqStream = request.GetRequestStream();
         reqStream.Write(postData, 0, postData.Length);
         HttpWebResponse response = (HttpWebResponse)request.GetResponse();
