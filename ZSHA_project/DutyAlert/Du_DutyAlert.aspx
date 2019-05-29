@@ -21,6 +21,9 @@
     <div>
         <table>
             <tr>
+                <td>企业名称：</td><td><input type="text" id="companyname" name="companyname"/></td>
+            </tr>
+            <tr>
                 <td>社会信用代码：</td><td><input type="text" id="username" name="username"/></td>
             </tr>
             <tr>
@@ -31,11 +34,13 @@
             </tr>
             <tr>
                 <td>预警类型：</td><td>增值税：<input type="checkbox" id="addtax" name="addtax" value="1"/>
-                                        所得税：<input type="checkbox" id="incometax" name="incometax" value="2"/></td>
+                                       所得税：<input type="checkbox" id="incometax" name="incometax" value="2"/></td>
             </tr>
-            <tr><td colspan="2"><button onclick="getDutyAlert()">税务预警</button></td></tr>
-            <tr><td colspan="2" id="tax"> </td></tr>
+            <tr><td colspan="2"><button onclick="getDutyAlert()">税务预警</button><div id="tax"></div></td></tr>
         </table>
+    </div>
+    <div id="taxtable">
+
     </div>
 </body>
 <script type="text/javascript">
@@ -52,22 +57,15 @@
         //访问进行数据查询
         $.ajax({
             url: "../Ashx/DutyAlert/Du_DutyAlert.ashx",
-            data: { username: $('#username').val(), password:mpwd, type: type, dutytime: $('#dutytime').val() },
+            data: { companyname:$('#companyname').val(),username: $('#username').val(), password:mpwd, type: type, dutytime: $('#dutytime').val() },
             contentType: 'application/x-www-form-urlencoded',
             type: 'post',
             traditional: 'true',
             beforeSend:function(){
                 $("#tax").html("<span style='color:green'>查询中，请稍等...</span>");
             },
-            success: function (result)  {
-                var year = result.split(",");
-                var msg = "";
-                for (var i = 0; i < year.length-1; i++) {
-                    msg+=year[i]+"年所得税数据缺失，请填报！"
-                }
-                if (msg!="") {
-                    alert(msg);
-                }
+            success: function (result) {
+                console.log(result)
                 $("#tax").html("<span style='color:green'>查询结束</span>");
             }
         });

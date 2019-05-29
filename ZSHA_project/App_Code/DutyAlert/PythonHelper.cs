@@ -28,7 +28,7 @@ public class PythonHelper
     ///zsxm_dm：所得税和增值税类型
     /// </summary>
     /// <returns>返回python结果</returns>
-    public string getTax(string username, string pwd, string sssq_q, string sssq_z,string zsxm_dm)
+    public string getTax(string username, string pwd, string sssq_q, string sssq_z,string zsxm_dm,string taxtype)
     {
         string serviceAddress = "http://127.0.0.1:8091/ZSHA_DutyAlert/";
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serviceAddress);
@@ -37,7 +37,7 @@ public class PythonHelper
         request.KeepAlive = false;
         request.ContentType = "application/x-www-form-urlencoded;charset=utf-8";
         //使用utf-8格式组装post参数
-        string data = "username="+ username + "&pwd="+pwd+"&sssq_q="+ sssq_q + "&sssq_z="+ sssq_z+ "&zsxm_dm="+ zsxm_dm + "";
+        string data = "username="+ username + "&pwd="+pwd+"&sssq_q="+ sssq_q + "&sssq_z="+ sssq_z+ "&zsxm_dm="+ zsxm_dm + "&taxtype="+ taxtype + "";
         byte[] postData =Encoding.UTF8.GetBytes(data);
         Stream reqStream = request.GetRequestStream();
         reqStream.Write(postData, 0, postData.Length);
