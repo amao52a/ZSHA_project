@@ -16,6 +16,8 @@ public class Du_DutyAlert : IHttpHandler {
         string username_str=context.Request.Form["username"];
         string password_str=context.Request.Form["password"];
         string companyname_str=context.Request.Form["companyname"];
+        string county_str=context.Request.Form["county"];
+        string industry_str = context.Request.Form["industry"];
         int type_i=int.Parse(context.Request.Form["type"].ToString());
         string dutytime_str=context.Request.Form["dutytime"];
         //查询指定时间是否有数据（没有通过python获取）
@@ -91,8 +93,8 @@ public class Du_DutyAlert : IHttpHandler {
                 new SqlParameter("@Companys_Numbers", username_str),
                 new SqlParameter("@USCCs", username_str),
                 new SqlParameter("@Companys_Names", companyname_str),
-                new SqlParameter("@Areas_Numbers", ""),
-                new SqlParameter("@Industrys_Numbers", ""),
+                new SqlParameter("@Areas_Numbers", county_str),
+                new SqlParameter("@Industrys_Numbers", industry_str),
                 new SqlParameter("@FinanceYear", dutytime_str.Substring(0,4)),
                 new SqlParameter("@FinanceMonth", int.Parse(dutytime_str.Substring(5,2)))};
             SqlHelper.ExecuteNonQuery(wsql_str,parameters);

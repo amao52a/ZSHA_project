@@ -26,10 +26,13 @@ public class Du_Areas : IHttpHandler {
             case "remove":
                 Areasremove(context);
                 break;
+            case "getAreas":
+                getAreas(context);
+                break;
         }
         context.Response.Write(json_str);
     }
-    
+
     //查询方法
     public void Areassearch(HttpContext context)
     {
@@ -38,7 +41,7 @@ public class Du_Areas : IHttpHandler {
         DataTable dt = SqlHelper.ExecuteDataTable(sql_str);
         json_str=GetTreeJsonByTable(dt, "id","F_Numbers", 0);
     }
-    
+
     #region 根据DataTable生成EasyUI Tree Json树结构
     /// <summary>
     /// 根据DataTable生成EasyUI Tree Json树结构
@@ -83,7 +86,7 @@ public class Du_Areas : IHttpHandler {
         return result.ToString();
     }
     #endregion 
-    
+
     //保存方法
     public void Areassave(HttpContext context)
     {
@@ -118,7 +121,7 @@ public class Du_Areas : IHttpHandler {
             json_str = "保存出错，请联系管理员!";
         }
     }
-    
+
     //删除方法
     public void Areasremove(HttpContext context)
     {
@@ -134,6 +137,21 @@ public class Du_Areas : IHttpHandler {
             json_str = "删除出错，请联系管理员!";
         }
     }
+
+
+    //查询市区县
+    public void getAreas(HttpContext context)
+    {
+        string id_str = context.Request.Form["AreasId"];
+        string sql_str = "select * from Areas Where F_Numbers="+id_str+";";
+        DataTable dt = SqlHelper.ExecuteDataTable(sql_str);
+        json_str = "<option value=''>---请选择---</option>";
+        foreach (DataRow dr in dt.Rows)
+        {
+            json_str += "<option value=\'"+dr["Numbers"]+"\'>"+dr["Names"]+"</option>";
+        }
+    }
+
 
     public bool IsReusable {
         get {

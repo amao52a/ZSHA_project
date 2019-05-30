@@ -29,6 +29,9 @@ public class Du_Industrys : IHttpHandler {
             case "remove":
                 Industrysremove(context);
                 break;
+            case "getIndustrys":
+                getIndustrys(context);
+                break;
         }
         context.Response.Write(json_str);
     }
@@ -109,6 +112,21 @@ public class Du_Industrys : IHttpHandler {
             json_str = "删除出错，请联系管理员!";
         }
     }
+
+
+    //根据区县查行业
+    public void getIndustrys(HttpContext context)
+    {
+        string id_str = context.Request.Form["IndustrysId"];
+        string sql_str = "select * from Industrys Where Areas_Numbers="+id_str+";";
+        DataTable dt = SqlHelper.ExecuteDataTable(sql_str);
+        json_str = "<option value=''>---请选择---</option>";
+        foreach (DataRow dr in dt.Rows)
+        {
+            json_str += "<option value=\'"+dr["Numbers"]+"\'>"+dr["Names"]+"</option>";
+        }
+    }
+        
 
     public bool IsReusable {
         get {

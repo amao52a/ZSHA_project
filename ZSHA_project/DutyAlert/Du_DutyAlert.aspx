@@ -17,28 +17,44 @@
             border-collapse: collapse;
             margin: auto;
         }
+        td{
+            text-align:center;
+            width:125px;
+        }
     </style>
 </head>
 <body>
     <div>
         <table>
             <tr>
-                <td>企业名称：</td><td><input type="text" id="companyname" name="companyname"/></td>
+                <td>企业名称：</td><td><input type="text" id="companyname" name="companyname"/></td><td>社会信用代码：</td><td><input type="text" id="username" name="username"/></td>
             </tr>
             <tr>
-                <td>社会信用代码：</td><td><input type="text" id="username" name="username"/></td>
+                <td>密码：</td><td><input type="password" id="password" name="password"/></td><td>预警日期：</td><td><input type="text" id="dutytime" name="dutytime" onclick="selectMonth()"/></td>
             </tr>
             <tr>
-                <td>密码：</td><td><input type="password" id="password" name="password"/></td>
+                <td>地区行业：</td>
+                <td>
+                    省<select id="province" style="width:105px" onchange="getcity()">
+                        <%=Province_str %>
+                     </select>
+                </td>
+                <td>
+                    市<select id="city" style="width:105px" onchange="getcounty()"></select>
+                </td>
+                <td>
+                    区县<select id="county" style="width:105px" onchange="getindustry()"></select>
+                </td>
             </tr>
             <tr>
-                <td>预警日期：</td><td><input type="text" id="dutytime" name="dutytime" onclick="selectMonth()"/></td>
-            </tr>
-            <tr>
+                <td>行业：</td>
+                <td>
+                    <select id="industry" style="width:105px"></select>
+                </td>
                 <td>预警类型：</td><td>增值税：<input type="checkbox" id="addtax" name="addtax" value="1"/>
                                        所得税：<input type="checkbox" id="incometax" name="incometax" value="2"/></td>
             </tr>
-            <tr><td colspan="2"><button onclick="getDutyAlert()">税务预警</button><div id="tax"></div></td></tr>
+            <tr><td><button onclick="getDutyAlert()">税务预警</button></td><td colspan="3"><div id="tax"></div></td></tr>
         </table>
     </div>
     <div id="TabMain">
@@ -77,7 +93,7 @@
         //访问进行数据查询
         $.ajax({
             url: "../Ashx/DutyAlert/Du_DutyAlert.ashx",
-            data: { companyname:$('#companyname').val(),username: $('#username').val(), password:mpwd, type: type, dutytime: $('#dutytime').val() },
+            data: { companyname:$('#companyname').val(),username: $('#username').val(), password:mpwd, type: type, dutytime: $('#dutytime').val(),county:$("#county").val(),industry:$("#industry").val() },
             contentType: 'application/x-www-form-urlencoded',
             type: 'post',
             traditional: 'true',
@@ -138,6 +154,48 @@
             id:id,name:name,lock:false,url:url,title:name
         }
         window.tab.add(table);
+    }
+
+    //获取市
+    function getcity() {
+        $.ajax({
+            url: "../Ashx/DutyAlert/Du_Areas.ashx?type=getAreas",
+            data: { AreasId: $("#province").val() },
+            contentType: 'application/x-www-form-urlencoded',
+            type: 'post',
+            traditional: 'true',
+            success: function (result)  {
+                $("#city").html(result);
+            }
+        });
+    }
+
+     //获取区县
+    function getcounty() {
+         $.ajax({
+            url: "../Ashx/DutyAlert/Du_Areas.ashx?type=getAreas",
+            data: { AreasId: $("#city").val() },
+            contentType: 'application/x-www-form-urlencoded',
+            type: 'post',
+            traditional: 'true',
+            success: function (result)  {
+                $("#county").html(result);
+            }
+        });
+    }
+
+     //获取行业
+    function getindustry() {
+        $.ajax({
+            url: "../Ashx/DutyAlert/Du_Industrys.ashx?type=getIndustrys",
+            data: { IndustrysId: $("#county").val() },
+            contentType: 'application/x-www-form-urlencoded',
+            type: 'post',
+            traditional: 'true',
+            success: function (result)  {
+                $("#industry").html(result);
+            }
+        });
     }
 
 </script>
