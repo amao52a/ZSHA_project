@@ -27,34 +27,35 @@
     <div>
         <table>
             <tr>
-                <td>企业名称：</td><td><input type="text" id="companyname" name="companyname"/></td><td>社会信用代码：</td><td><input type="text" id="username" name="username"/></td>
+                <td>企业名称：</td><td><input type="text" id="companyname" name="companyname" data-valid="true" style="width:95%" placeholder="请填写企业名称"/></td>
+                <td>社会信用代码：</td><td><input type="text" id="username" name="username" data-valid="true" style="width:95%" placeholder="请填写社会信用代码"/></td>
             </tr>
             <tr>
-                <td>密码：</td><td><input type="password" id="password" name="password"/></td><td>预警日期：</td><td><input type="text" id="dutytime" name="dutytime" onclick="selectMonth()"/></td>
+                <td>密码：</td><td><input type="password" id="password" name="password" data-valid="true" style="width:95%" placeholder="请填写密码"/></td>
+                <td>预警日期：</td><td><input type="text" id="dutytime" name="dutytime" onclick="selectMonth()" data-valid="true" style="width:95%"   placeholder="请填写预警日期"/></td>
             </tr>
             <tr>
                 <td>地区行业：</td>
                 <td>
-                    省<select id="province" style="width:105px" onchange="getcity()">
+                    省<select id="province" style="width:75%" onchange="getcity()" data-valid="true" placeholder="请选择省份">
                         <%=Province_str %>
                      </select>
                 </td>
                 <td>
-                    市<select id="city" style="width:105px" onchange="getcounty()"></select>
+                    市<select id="city" style="width:75%" onchange="getcounty()" data-valid="true" placeholder="请填写地市"></select>
                 </td>
                 <td>
-                    区县<select id="county" style="width:105px" onchange="getindustry()"></select>
+                    区县<select id="county" style="width:75%" onchange="getindustry()" data-valid="true" placeholder="请填写区县"></select>
                 </td>
             </tr>
             <tr>
                 <td>行业：</td>
                 <td>
-                    <select id="industry" style="width:105px"></select>
+                    <select id="industry" style="width:75%" data-valid="true" placeholder="请填写行业"></select>
                 </td>
-                <td>预警类型：</td><td>增值税：<input type="checkbox" id="addtax" name="addtax" value="1"/>
-                                       所得税：<input type="checkbox" id="incometax" name="incometax" value="2"/></td>
+                <td>预警类型：</td><td>增值税：<input type="checkbox" id="addtax" name="addtax" value="1"/>所得税：<input type="checkbox" id="incometax" name="incometax" value="2"/></td>
             </tr>
-            <tr><td><button onclick="getDutyAlert()">税务预警</button></td><td colspan="3"><div id="tax"></div></td></tr>
+            <tr><td><button id="gettax" onclick="getDutyAlert()">税务预警</button></td><td colspan="3"><div id="tax"></div></td></tr>
         </table>
     </div>
     <div id="TabMain">
@@ -80,26 +81,88 @@
     </div>
 </body>
 <script type="text/javascript">
+    //页面初始化
+    $(function () {
+        $("[data-valid='true']").each(function () {
+            $(this).after("<span style='color:red'>*</span>")
+        });
+    })
 
     function getDutyAlert() {
+        var isval = true;
         var type = 0
-        $.each($('input:checkbox:checked'),function(){
-            type+=parseInt($(this).val());
+        $("[data-valid='true']").each(function () {
+            var msg = $(this).attr("placeholder");
+            if (typeof (msg) != "undefined" && $(this).val() == "") {
+                alert(msg);
+                isval = false;
+                return isval;
+            }
         });
-        var publickey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKRjqvZrVffhtgtu96a9fw413O0zXR/rTJffpFTixAFeipMKsDnUL/g4T18+0kFI40Y6u8cH4OirRbAm+za8nx6xdsWt/W7/rD2r2xIG8oWaBSJzC7IFshDAaLJ2FxGKahsvqAwTIRi65HgjTyc2YYq6L3/Ez8Nuu4piaUYfDSFQIDAQAB";
-        var encrypt = new JSEncrypt();
-        encrypt.setPublicKey(publickey);
-        var mpwd=encrypt.encrypt($('#password').val());
+        $.each($('input:checkbox:checked'), function () {
+            type += parseInt($(this).val());
+        });
+        if (type == 0) {
+            alert("请选择预警类型");
+            isval = false;
+            return isval;
+        }
+        if (isval) {
+            //验证通过
+            var publickey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKRjqvZrVffhtgtu96a9fw413O0zXR/rTJffpFTixAFeipMKsDnUL/g4T18+0kFI40Y6u8cH4OirRbAm+za8nx6xdsWt/W7/rD2r2xIG8oWaBSJzC7IFshDAaLJ2FxGKahsvqAwTIRi65HgjTyc2YYq6L3/Ez8Nuu4piaUYfDSFQIDAQAB";
+            var encrypt = new JSEncrypt();
+            encrypt.setPublicKey(publickey);
+            var mpwd = encrypt.encrypt($('#password').val());
+            var username = $('#username').val();
+            //校验账号密码
+            $.ajax({
+                url: "../Ashx/DutyAlert/Du_Checkpwd.ashx",
+                data: {
+                    username: username,
+                    password: mpwd,
+                },
+                contentType: 'application/x-www-form-urlencoded',
+                type: 'post',
+                traditional: 'true',
+                beforeSend:function(){
+                    $("#tax").html("<span style='color:green'>查询中，请稍等...</span>");
+                    $("#gettax").attr("disabled", "disabled");
+                },
+                success: function (result) {
+                    if (result=="success") {
+                        catchTax(username, mpwd,type)
+                    } else {
+                        $("#tax").html("<span style='color:red'>"+result+"</span>");
+                        $("#gettax").removeAttr("disabled");
+                    }
+                    
+                },
+                error: function () {
+                    $("#tax").html("<span style='color:red'>程序错误，请联系管理员！</span>");
+                    $("#gettax").removeAttr("disabled");
+                }
+            });
+        }
+    }
+
+    function catchTax(username,pwd,type) {
         //访问进行数据查询
         $.ajax({
             url: "../Ashx/DutyAlert/Du_DutyAlert.ashx",
-            data: { companyname:$('#companyname').val(),username: $('#username').val(), password:mpwd, type: type, dutytime: $('#dutytime').val(),county:$("#county").val(),industry:$("#industry").val() },
+            data: {
+                companyname: $('#companyname').val(),
+                username: username,
+                password: pwd,
+                type: type,
+                dutytime: $('#dutytime').val(),
+                county: $("#county").val(),
+                countyname: $("#county").find("option:selected").text(),
+                industry: $("#industry").val(),
+                industryname:$("#industry").find("option:selected").text()
+            },
             contentType: 'application/x-www-form-urlencoded',
             type: 'post',
             traditional: 'true',
-            beforeSend:function(){
-                $("#tax").html("<span style='color:green'>查询中，请稍等...</span>");
-            },
             success: function (result) {
                 rs = jQuery.parseJSON(result)
                 var count=0
@@ -122,10 +185,14 @@
                     count++;
                 }
                 if (count > 0) {
-                    $("#tax").html("<span style='color:red'>请补充完成以下数据，便于结果更加精确，</span><span style='color:green'>您的查询号为：" + rs[2].numbers + "</span>");
+                    $("#tax").html("<span style='color:red'>请补充完成以下数据，便于结果更加精确，</span><span style='color:green'>您的查询号为：" + rs[2].numbers + "</span><button onclick='checkrs(\""+rs[2].numbers +"\")'>查看结果</button>");
                 } else {
-                    $("#tax").html("<span style='color:green'>您的查询号为：" + rs[2].numbers + "</span>");
+                    $("#tax").html("<span style='color:green'>您的查询号为：" + rs[2].numbers + "</span><button onclick='checkrs(\""+rs[2].numbers +"\")'>查看结果</button>");
                 } 
+                $("#gettax").removeAttr("disabled");
+            },error:function () {
+                $("#tax").html("<span style='color:red'>程序错误，请联系管理员！</span>");
+                $("#gettax").removeAttr("disabled");
             }
         });
     }
@@ -196,6 +263,10 @@
                 $("#industry").html(result);
             }
         });
+    }
+
+    function checkrs(id) {
+        window.location.href="http://47.104.72.24:102/Operations_test.aspx?id="+id+"";
     }
 
 </script>

@@ -11,11 +11,11 @@ jQuery( function(){
 */
 window.AbstractTab = {};
 AbstractTab.add = function( option ){
-	// 如果已经存在,就激活该菜单
-	//if( this.isExist(option.id) ){
-		//this.click(option.id);
-		//return false;
-	//}
+	//如果已经存在,就激活该菜单
+	if( this.isExist(option.id) ){
+		this.click(option.id);
+		return false;
+	}
 	this.addTab(option);
 	this.addFrame(option);
 };
@@ -65,7 +65,7 @@ AbstractTab.click = function( id ){
 
 // 判断标签是否存在
 AbstractTab.isExist = function( id ){
-	return jQuery("#" + id).size() > 0;
+    return jQuery("#" + id).length > 0;
 };
 
 // 取得简短的名称

@@ -10,9 +10,13 @@ using System.Web.UI.WebControls;
 
 public partial class DutyAlert_Du_Python : System.Web.UI.Page
 {
+    public string taxtype = "Ta020001,Ta020002,Ta020003";
     protected void Page_Load(object sender, EventArgs e)
     {
-
+        int count = taxtype.Length;
+        int icount = "Ta020001".Length;
+        Response.Write(count);
+        Response.Write(icount);
     }
 
     protected void Button1_Click(object sender, EventArgs e)

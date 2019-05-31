@@ -18,6 +18,8 @@ public class Du_DutyAlert : IHttpHandler {
         string companyname_str=context.Request.Form["companyname"];
         string county_str=context.Request.Form["county"];
         string industry_str = context.Request.Form["industry"];
+        string countyname_str=context.Request.Form["countyname"];
+        string industryname_str = context.Request.Form["industryname"];
         int type_i=int.Parse(context.Request.Form["type"].ToString());
         string dutytime_str=context.Request.Form["dutytime"];
         //查询指定时间是否有数据（没有通过python获取）
@@ -60,8 +62,16 @@ public class Du_DutyAlert : IHttpHandler {
                 taxtype=taxtype.Replace(dr[0].ToString()," ");
             }
             PythonHelper ph = new PythonHelper();
-            string rs=ph.getTax(username_str,password_str,year_str+"0101",year_str+"1231","2",taxtype);
-            json_str += "[{\"year\":"+rs+"},";
+            if (taxtype.Length>8)
+            {
+                string rs=ph.getTax(username_str,password_str,year_str+"0101",year_str+"1231","2",taxtype);
+                json_str += "[{\"year\":"+rs+"},";
+            }
+            else
+            {
+                json_str += "[{\"year\":\"[]\"},";
+            }
+
 
             //所得税上年
             taxtype = "Ta020001,Ta020002,Ta020003";
@@ -73,30 +83,41 @@ public class Du_DutyAlert : IHttpHandler {
                 taxtype=taxtype.Replace(dr[0].ToString()," ");
             }
             ph = new PythonHelper();
-            rs=ph.getTax(username_str,password_str,year_str+"0101",year_str+"1231","2",taxtype);
-            json_str += "{\"lastyear\":"+rs+"},";
+            if (taxtype.Length > 8)
+            {
+                string lrs=ph.getTax(username_str,password_str,year_str+"0101",year_str+"1231","2",taxtype);
+                json_str += "{\"lastyear\":"+lrs+"},";
+            }
+            else
+            {
+                json_str += "{\"lastyear\":\"[]\"},";
+            }
+
         }
         //添加warn表记录（先判断是否存在，不存在就新建）
         DataTable dtw=SqlHelper.ExecuteDataTable("select Numbers from Warns where Companys_Numbers='" + username_str + "' and FinanceYear=" + dutytime_str.Substring(0,4) + " and FinanceMonth=" + int.Parse(dutytime_str.Substring(5,2)) + "");
         if (dtw.Rows.Count>0)
         {
-            json_str += "{\"numbers\":"+dtw.Rows[0][0]+"}]";
+            json_str += "{\"numbers\":\""+dtw.Rows[0][0]+"\"}]";
         }
         else
         {
             //生成单号（地区行业暂时没有添加）
             Random rNum = new Random();
             string number_str =DateTime.Now.ToString("yyMMddHHmmss") + rNum.Next(0, 9999).ToString();
-            string wsql_str = "insert into Warns (Numbers,Companys_Numbers,USCCs,Companys_Names,Areas_Numbers,Industrys_Numbers,FinanceYear,FinanceMonth) " +
-                 " values (@Numbers,@Companys_Numbers,@USCCs,@Companys_Names,@Areas_Numbers,@Industrys_Numbers,@FinanceYear,@FinanceMonth);";
-            SqlParameter[] parameters ={ new SqlParameter("@Numbers", number_str),
+            string wsql_str = "insert into Warns (Numbers,Companys_Numbers,USCCs,Companys_Names,Areas_Numbers,Industrys_Numbers,FinanceYear,FinanceMonth,Areas_Names,Industrys_Names,Times) " +
+                 " values (@Numbers,@Companys_Numbers,@USCCs,@Companys_Names,@Areas_Numbers,@Industrys_Numbers,@FinanceYear,@FinanceMonth,@Areas_Names,@Industrys_Names,@Times);";
+            SqlParameter[] parameters ={ new SqlParameter("@Numbers", LDBasicTools.WarnsNumbers(county_str)),
                 new SqlParameter("@Companys_Numbers", username_str),
                 new SqlParameter("@USCCs", username_str),
                 new SqlParameter("@Companys_Names", companyname_str),
                 new SqlParameter("@Areas_Numbers", county_str),
                 new SqlParameter("@Industrys_Numbers", industry_str),
                 new SqlParameter("@FinanceYear", dutytime_str.Substring(0,4)),
-                new SqlParameter("@FinanceMonth", int.Parse(dutytime_str.Substring(5,2)))};
+                new SqlParameter("@FinanceMonth", int.Parse(dutytime_str.Substring(5,2))),
+                new SqlParameter("@Areas_Names", countyname_str),
+                new SqlParameter("@Industrys_Names", industryname_str),
+                new SqlParameter("@Times", LDBasicTools.DateStrToInt(DateTime.Now.ToString()))};
             SqlHelper.ExecuteNonQuery(wsql_str,parameters);
             json_str += "{\"numbers\":"+number_str+"}]";
         }
