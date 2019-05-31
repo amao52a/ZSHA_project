@@ -132,7 +132,7 @@ AbstractTab.closeAll = function(){
 	});
 	var activeClass = this.activeClass;
 	// 如果没有激活的锁定的标签，那么激活最后一个锁定的标签。
-	if( this.tabs.find("." + activeClass).size() == 0 ){
+	if( this.tabs.find("." + activeClass).length == 0 ){
 		this.tabs.find("li:last").click();
 	}
 };

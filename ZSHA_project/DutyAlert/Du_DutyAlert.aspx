@@ -86,9 +86,14 @@
         $("[data-valid='true']").each(function () {
             $(this).after("<span style='color:red'>*</span>")
         });
+        var option = {tabID:"Tabs",frameID:"Frames",activeClass:"on",lockClass:"locked",leftID:"Left",
+	    rightID:"Right",resetID:"Reset",closeID:"Close"};
+        window.tab = FantasyTab.create(option);
     })
 
     function getDutyAlert() {
+        //关闭所有
+        window.tab.closeAll();
         var isval = true;
         var type = 0
         $("[data-valid='true']").each(function () {
@@ -202,9 +207,6 @@
     }  
 
     function addTab(id,table,year,username){
-        var option = {tabID:"Tabs",frameID:"Frames",activeClass:"on",lockClass:"locked",leftID:"Left",
-	    rightID:"Right",resetID:"Reset",closeID:"Close"};
-        window.tab = FantasyTab.create(option);
         var url = "";
         var name = "";
         if (table == "A100000") {

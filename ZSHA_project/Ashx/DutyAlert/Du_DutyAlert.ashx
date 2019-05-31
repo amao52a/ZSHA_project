@@ -69,7 +69,7 @@ public class Du_DutyAlert : IHttpHandler {
             }
             else
             {
-                json_str += "[{\"year\":\"[]\"},";
+                json_str += "[{\"year\":[]},";
             }
 
 
@@ -90,7 +90,7 @@ public class Du_DutyAlert : IHttpHandler {
             }
             else
             {
-                json_str += "{\"lastyear\":\"[]\"},";
+                json_str += "{\"lastyear\":[]},";
             }
 
         }
@@ -104,10 +104,10 @@ public class Du_DutyAlert : IHttpHandler {
         {
             //生成单号（地区行业暂时没有添加）
             Random rNum = new Random();
-            string number_str =DateTime.Now.ToString("yyMMddHHmmss") + rNum.Next(0, 9999).ToString();
+            string number_str = LDBasicTools.WarnsNumbers(county_str);
             string wsql_str = "insert into Warns (Numbers,Companys_Numbers,USCCs,Companys_Names,Areas_Numbers,Industrys_Numbers,FinanceYear,FinanceMonth,Areas_Names,Industrys_Names,Times) " +
                  " values (@Numbers,@Companys_Numbers,@USCCs,@Companys_Names,@Areas_Numbers,@Industrys_Numbers,@FinanceYear,@FinanceMonth,@Areas_Names,@Industrys_Names,@Times);";
-            SqlParameter[] parameters ={ new SqlParameter("@Numbers", LDBasicTools.WarnsNumbers(county_str)),
+            SqlParameter[] parameters ={ new SqlParameter("@Numbers", number_str),
                 new SqlParameter("@Companys_Numbers", username_str),
                 new SqlParameter("@USCCs", username_str),
                 new SqlParameter("@Companys_Names", companyname_str),
@@ -119,7 +119,7 @@ public class Du_DutyAlert : IHttpHandler {
                 new SqlParameter("@Industrys_Names", industryname_str),
                 new SqlParameter("@Times", LDBasicTools.DateStrToInt(DateTime.Now.ToString()))};
             SqlHelper.ExecuteNonQuery(wsql_str,parameters);
-            json_str += "{\"numbers\":"+number_str+"}]";
+            json_str += "{\"numbers\":\""+number_str+"\"}]";
         }
         context.Response.Write(json_str);
     }
