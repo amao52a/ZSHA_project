@@ -83,7 +83,7 @@ AbstractTab.addFrame = function( option ){
 	var frame = option.frame || {};
 	var style = frame.style || "width:100%;height:100%";
 	var name = frame.name || id;
-	var frame = "<iframe id='" + id + "' name='" + name + "' frameborder='0' style='" + style + "' src='" + url + "'></iframe>";
+    var frame = "<iframe id='" + id + "' name='" + name + "' frameborder='0' style='" + style + "' src='" + url + "'></iframe>";
 	jQuery(frame).appendTo(this.frames);
 	this.loadFrame(option.id);
 };

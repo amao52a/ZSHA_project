@@ -14,13 +14,17 @@
     <title>税务预警</title>
     <style>
         table {
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing:  0px 2px; 
             margin: auto;
         }
         td{
-            text-align:center;
+            text-align:right;
             width:125px;
         }
+        #progress { position:relative; width:400px; border: 1px solid #ddd; padding: 1px; border-radius: 3px; }  
+        #bar { background-color: #B4F5B4; width:0%; height:20px; border-radius: 3px; }  
+        #percent { position:absolute; display:inline-block; top:3px; left:48%; }  
     </style>
 </head>
 <body>
@@ -51,11 +55,17 @@
             <tr>
                 <td>行业：</td>
                 <td>
-                    <select id="industry" style="width:75%" data-valid="true" placeholder="请填写行业"></select>
+                    <select id="industry" style="width:95%" data-valid="true" placeholder="请填写行业"></select>
                 </td>
                 <td>预警类型：</td><td>增值税：<input type="checkbox" id="addtax" name="addtax" value="1"/>所得税：<input type="checkbox" id="incometax" name="incometax" value="2"/></td>
             </tr>
-            <tr><td><button id="gettax" onclick="getDutyAlert()">税务预警</button></td><td colspan="3"><div id="tax"></div></td></tr>
+            <tr><td><button id="gettax" onclick="getDutyAlert()">税务预警</button></td>
+                <td colspan="3">
+                    <div id="progress">  
+                        <div id="bar"></div>  
+                        <div id="percent">0%</div >  
+                    </div>
+                <div id="tax"></div></td></tr>
         </table>
     </div>
     <div id="TabMain">
@@ -76,7 +86,7 @@
 	</div>
 </div>
     <!-- 这里存放生成的IFrame 只要ID='Frames'就可以，可以根据布局自己定义-->
-    <div id="Frames" style="height:768px">
+    <div id="Frames" style="height:auto;overflow:auto;">
 
     </div>
 </body>
@@ -89,6 +99,7 @@
         var option = {tabID:"Tabs",frameID:"Frames",activeClass:"on",lockClass:"locked",leftID:"Left",
 	    rightID:"Right",resetID:"Reset",closeID:"Close"};
         window.tab = FantasyTab.create(option);
+        $("#progress").show();  
     })
 
     function getDutyAlert() {
@@ -129,12 +140,16 @@
                 contentType: 'application/x-www-form-urlencoded',
                 type: 'post',
                 traditional: 'true',
-                beforeSend:function(){
-                    $("#tax").html("<span style='color:green'>查询中，请稍等...</span>");
+                beforeSend: function () {
+                    $("#progress").show();  
+                    $("#bar").width('0%');  
+                    $("#percent").html("0%");  
                     $("#gettax").attr("disabled", "disabled");
                 },
                 success: function (result) {
-                    if (result=="success") {
+                    if (result == "success") {
+                        $("#bar").width('10%');  
+                        $("#percent").html("10%");
                         catchTax(username, mpwd,type)
                     } else {
                         $("#tax").html("<span style='color:red'>"+result+"</span>");
@@ -163,7 +178,8 @@
                 county: $("#county").val(),
                 countyname: $("#county").find("option:selected").text(),
                 industry: $("#industry").val(),
-                industryname:$("#industry").find("option:selected").text()
+                industryname: $("#industry").find("option:selected").text(),
+                "Method": "DoWork"
             },
             contentType: 'application/x-www-form-urlencoded',
             type: 'post',
@@ -176,18 +192,18 @@
                     var y = rs[0].year[i]
                     if (y.state=="false") {
                         //打开相应的填报页面
-                        addTab(i+1,y.table, y.year,$('#username').val());
+                        addTab(i + 1, y.table, y.year, $('#username').val());
+                        count++;
                     }
-                    count++;
                 }
                 //上年度的年报
                 for (var i = 0; i < rs[1].lastyear.length;i++) {
                     var ly = rs[1].lastyear[i]
                     if (ly.state=="false") {
                         //打开相应的填报页面
-                        addTab((i+1)*10,ly.table, ly.year,$('#username').val());
+                        addTab((i + 1) * 10, ly.table, ly.year, $('#username').val());
+                        count++;
                     }
-                    count++;
                 }
                 if (count > 0) {
                     $("#tax").html("<span style='color:red'>请补充完成以下数据，便于结果更加精确，</span><span style='color:green'>您的查询号为：" + rs[2].numbers + "</span><button onclick='checkrs(\""+rs[2].numbers +"\")'>查看结果</button>");
@@ -197,7 +213,39 @@
                 $("#gettax").removeAttr("disabled");
             },error:function () {
                 $("#tax").html("<span style='color:red'>程序错误，请联系管理员！</span>");
+                StopProgress();
                 $("#gettax").removeAttr("disabled");
+            }
+        });
+        //开始查询进度
+        setTimeout(GetProgress, 500);
+    }
+
+    function StopProgress() {
+        $.ajax({
+            url: "../Ashx/DutyAlert/Du_DutyAlert.ashx",
+            type: "POST",
+            data: { "Method": "StopProgress" },
+        });
+    }
+    //查询进度
+    function GetProgress() {
+        $.ajax({
+            url: "../Ashx/DutyAlert/Du_DutyAlert.ashx",
+            type: "POST",
+            data: { "Method": "GetProgress" },
+            success: function (data) {
+                if (data != -1) {
+                    //工作没有结束，继续查询进度
+                    setTimeout(GetProgress, 500);
+                    $("#percent").html(data+"%"); 
+                    $("#bar").width(parseInt(data)+"%");
+
+                } else {
+                    //工作完成
+                    $("#percent").html("OK");
+                    $("#bar").width("100%");
+                }
             }
         });
     }
@@ -209,18 +257,28 @@
     function addTab(id,table,year,username){
         var url = "";
         var name = "";
+        var style = {};
         if (table == "A100000") {
             url = "Du_A100000.aspx?year=" + year + "&companysnumbers=" + username + "";
-            name="中华人民共和国企业所得税年度纳税申报表（"+year+"年）"
+            name = "中华人民共和国企业所得税年度纳税申报表（" + year + "年）"
+            style = {
+                style:"width:100%;height:900px"
+            }
         } else if (table == "A104000") {
             url = "Du_A104000.aspx?year=" + year + "&companysnumbers=" + username + "";
-            name="期间费用明细表（"+year+"年）"
+            name = "期间费用明细表（" + year + "年）"
+            style = {
+                style:"width:100%;height:670px"
+            }
         } else if (table == "A105050") {
             url = "Du_A105050.aspx?year=" + year + "&companysnumbers=" + username + "";
-            name="职工薪酬纳税调整明细表（"+year+"年）"
+            name = "职工薪酬纳税调整明细表（" + year + "年）"
+            style = {
+                style:"width:100%;height:425px"
+            }
         }
         var table = {
-            id:id,name:name,lock:false,url:url,title:name
+            id: id, name: name, lock: false, url: url, title: name, frame:style
         }
         window.tab.add(table);
     }
@@ -268,7 +326,7 @@
     }
 
     function checkrs(id) {
-        window.location.href="http://47.104.72.24:102/Operations_test.aspx?id="+id+"";
+        window.open("http://47.104.72.24:102/Operations.aspx?id=" + id + "")
     }
 
 </script>

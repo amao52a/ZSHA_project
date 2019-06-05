@@ -9,17 +9,50 @@ using System.Data.SqlClient;
 public class Du_DutyAlert : IHttpHandler {
 
     string json_str = "";
+    private HttpContext context;
 
     public void ProcessRequest (HttpContext context) {
         context.Response.ContentType = "text/plain";
         context.Request.ContentEncoding = Encoding.GetEncoding("utf-8"); //必须加上，否则会产生乱码
+        if (context.Request["Method"] == "GetProgress")
+        {
+            this.context = context;
+            context.Response.Clear();
+            context.Response.Write(this.GetProgress());
+            context.Response.End();
+        }else if (context.Request["Method"] == "StopProgress")
+        {
+            this.context.Application["progress"] = null;
+        }
+        else
+        {
+            this.DoWork(context);
+        }
+    }
+
+    private int GetProgress()
+    {
+        if (this.context.Application["progress"] != null)
+        {
+            return (int)this.context.Application["progress"];
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    private void DoWork(HttpContext context)
+    {
+        this.context = context;
+        this.context.Application["progress"]=10;
         string username_str=context.Request.Form["username"];
         string password_str=context.Request.Form["password"];
         string companyname_str=context.Request.Form["companyname"];
         string county_str=context.Request.Form["county"];
         string industry_str = context.Request.Form["industry"];
         string countyname_str=context.Request.Form["countyname"];
-        string industryname_str = context.Request.Form["industryname"];
+        string industryname_str =context.Request.Form["industryname"];
         int type_i=int.Parse(context.Request.Form["type"].ToString());
         string dutytime_str=context.Request.Form["dutytime"];
         //查询指定时间是否有数据（没有通过python获取）
@@ -36,6 +69,7 @@ public class Du_DutyAlert : IHttpHandler {
                 PythonHelper ph = new PythonHelper();
                 ph.getTax(username_str,password_str,year_str+month_str+"01",year_str+month_str+day_str,"1","0");
             }
+            this.context.Application["progress"]=30;
             //增值税上月
             DateTime lastTime=DateTime.Parse(dutytime_str);
             string lastdutytime_str = lastTime.AddMonths(-1).ToString("yyyy-MM");
@@ -50,6 +84,7 @@ public class Du_DutyAlert : IHttpHandler {
                 ph.getTax(username_str,password_str,year_str+month_str+"01",year_str+month_str+day_str,"1","0");
             }
         }
+        this.context.Application["progress"]=50;
         if ((type_i&2)==2)
         {
             //所得税本年
@@ -71,8 +106,7 @@ public class Du_DutyAlert : IHttpHandler {
             {
                 json_str += "[{\"year\":[]},";
             }
-
-
+            this.context.Application["progress"]=70;
             //所得税上年
             taxtype = "Ta020001,Ta020002,Ta020003";
             year_str = (int.Parse(year_str) - 1).ToString();
@@ -92,8 +126,8 @@ public class Du_DutyAlert : IHttpHandler {
             {
                 json_str += "{\"lastyear\":[]},";
             }
-
         }
+        this.context.Application["progress"]=90;
         //添加warn表记录（先判断是否存在，不存在就新建）
         DataTable dtw=SqlHelper.ExecuteDataTable("select Numbers from Warns where Companys_Numbers='" + username_str + "' and FinanceYear=" + dutytime_str.Substring(0,4) + " and FinanceMonth=" + int.Parse(dutytime_str.Substring(5,2)) + "");
         if (dtw.Rows.Count>0)
@@ -121,6 +155,7 @@ public class Du_DutyAlert : IHttpHandler {
             SqlHelper.ExecuteNonQuery(wsql_str,parameters);
             json_str += "{\"numbers\":\""+number_str+"\"}]";
         }
+        this.context.Application["progress"] = null;
         context.Response.Write(json_str);
     }
 
