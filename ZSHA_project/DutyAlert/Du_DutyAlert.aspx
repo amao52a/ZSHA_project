@@ -165,7 +165,9 @@
         }
     }
 
-    function catchTax(username,pwd,type) {
+    function catchTax(username, pwd, type) {
+        //产生随机值key
+        var Progress_key = new Date().getTime();
         //访问进行数据查询
         $.ajax({
             url: "../Ashx/DutyAlert/Du_DutyAlert.ashx",
@@ -179,7 +181,8 @@
                 countyname: $("#county").find("option:selected").text(),
                 industry: $("#industry").val(),
                 industryname: $("#industry").find("option:selected").text(),
-                "Method": "DoWork"
+                "Method": "DoWork",
+                "Progress_key": Progress_key
             },
             contentType: 'application/x-www-form-urlencoded',
             type: 'post',
@@ -213,31 +216,31 @@
                 $("#gettax").removeAttr("disabled");
             },error:function () {
                 $("#tax").html("<span style='color:red'>程序错误，请联系管理员！</span>");
-                StopProgress();
+                StopProgress(Progress_key);
                 $("#gettax").removeAttr("disabled");
             }
         });
         //开始查询进度
-        setTimeout(GetProgress, 500);
+        setTimeout("GetProgress("+Progress_key+")", 500);
     }
 
-    function StopProgress() {
+    function StopProgress(Progress_key) {
         $.ajax({
             url: "../Ashx/DutyAlert/Du_DutyAlert.ashx",
             type: "POST",
-            data: { "Method": "StopProgress" },
+            data: { "Method": "StopProgress","Progress_key": Progress_key },
         });
     }
     //查询进度
-    function GetProgress() {
+    function GetProgress(Progress_key) {
         $.ajax({
             url: "../Ashx/DutyAlert/Du_DutyAlert.ashx",
             type: "POST",
-            data: { "Method": "GetProgress" },
+            data: { "Method": "GetProgress","Progress_key": Progress_key },
             success: function (data) {
                 if (data != -1) {
                     //工作没有结束，继续查询进度
-                    setTimeout(GetProgress, 500);
+                    setTimeout("GetProgress("+Progress_key+")", 500);
                     $("#percent").html(data+"%"); 
                     $("#bar").width(parseInt(data)+"%");
 

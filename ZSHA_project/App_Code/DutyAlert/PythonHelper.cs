@@ -1,6 +1,4 @@
-﻿using IronPython.Hosting;
-using Microsoft.Scripting.Hosting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,11 +28,11 @@ public class PythonHelper
     /// <returns>返回python结果</returns>
     public string getTax(string username, string pwd, string sssq_q, string sssq_z,string zsxm_dm,string taxtype)
     {
-        string serviceAddress = "http://47.101.212.49:8091/ZSHA_DutyAlert/";
+        string serviceAddress = "http://127.0.0.1:8091/ZSHA_DutyAlert/";
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serviceAddress);
         request.Method = "POST";
-        request.ReadWriteTimeout = 5000;
-        request.KeepAlive = false;
+        //request.ReadWriteTimeout = 5000;
+        //request.KeepAlive = false;
         request.ContentType = "application/x-www-form-urlencoded;charset=utf-8";
         //使用utf-8格式组装post参数
         string data = "username="+ username + "&pwd="+pwd+"&sssq_q="+ sssq_q + "&sssq_z="+ sssq_z+ "&zsxm_dm="+ zsxm_dm + "&taxtype="+ taxtype + "";
@@ -55,11 +53,11 @@ public class PythonHelper
 
     public string checkpwd(string username, string pwd)
     {
-        string serviceAddress = "http://47.101.212.49:8091/Checkpwd/";
+        string serviceAddress = "http://127.0.0.1:8091/Checkpwd/";
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serviceAddress);
         request.Method = "POST";
-        request.ReadWriteTimeout = 5000;
-        request.KeepAlive = false;
+        //request.ReadWriteTimeout = 5000;
+        //request.KeepAlive = false;
         request.ContentType = "application/x-www-form-urlencoded;charset=utf-8";
         //使用utf-8格式组装post参数
         string data = "username=" + username + "&pwd=" + pwd + "";
