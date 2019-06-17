@@ -28,7 +28,7 @@ public class PythonHelper
     /// <returns>返回python结果</returns>
     public string getTax(string username, string pwd, string sssq_q, string sssq_z,string zsxm_dm,string taxtype)
     {
-        string serviceAddress = "http://127.0.0.1:8091/ZSHA_DutyAlert/";
+        string serviceAddress = "http://47.101.212.49:8091/ZSHA_DutyAlert/";
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serviceAddress);
         request.Method = "POST";
         //request.ReadWriteTimeout = 5000;
@@ -53,7 +53,7 @@ public class PythonHelper
 
     public string checkpwd(string username, string pwd)
     {
-        string serviceAddress = "http://127.0.0.1:8091/Checkpwd/";
+        string serviceAddress = "http://47.101.212.49:8091/Checkpwd/";
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serviceAddress);
         request.Method = "POST";
         //request.ReadWriteTimeout = 5000;

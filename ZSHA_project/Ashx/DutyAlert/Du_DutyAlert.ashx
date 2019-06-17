@@ -127,6 +127,11 @@ public class Du_DutyAlert : IHttpHandler {
                 json_str += "{\"lastyear\":[]},";
             }
         }
+        //当没有勾选所得税的时候，补充完成空返回值
+        else
+        {
+                json_str += "[{\"year\":[]},{\"lastyear\":[]},";
+        }
         context.Application[Progress_key]=90;
         //添加warn表记录（先判断是否存在，不存在就新建）
         DataTable dtw=SqlHelper.ExecuteDataTable("select Numbers from Warns where Companys_Numbers='" + username_str + "' and FinanceYear=" + dutytime_str.Substring(0,4) + " and FinanceMonth=" + int.Parse(dutytime_str.Substring(5,2)) + "");
