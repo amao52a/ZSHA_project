@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Web;
+
 
 /// <summary>
 /// PythonHelper 的摘要说明
@@ -28,14 +26,19 @@ public class PythonHelper
     /// <returns>返回python结果</returns>
     public string getTax(string username, string pwd, string sssq_q, string sssq_z,string zsxm_dm,string taxtype)
     {
-        string serviceAddress = "http://47.101.212.49:8091/ZSHA_DutyAlert/";
+        string serviceAddress = "http://127.0.0.1:8090/ZSHA_DutyAlert/";
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serviceAddress);
         request.Method = "POST";
         //request.ReadWriteTimeout = 5000;
         //request.KeepAlive = false;
         request.ContentType = "application/x-www-form-urlencoded;charset=utf-8";
         //使用utf-8格式组装post参数
-        string data = "username="+ username + "&pwd="+pwd+"&sssq_q="+ sssq_q + "&sssq_z="+ sssq_z+ "&zsxm_dm="+ zsxm_dm + "&taxtype="+ taxtype + "";
+        string data = "username="+ username + "&pwd="+pwd+"&sssq_q="+ sssq_q + "&sssq_z="+ sssq_z+ "&zsxm_dm="+ zsxm_dm + "&taxtype="+ taxtype + "" +
+            "&host=" + ConfigurationManager.ConnectionStrings["Conn_DataSource"].ConnectionString.ToString().Split(',')[0] + "" +
+            "&port="+ ConfigurationManager.ConnectionStrings["Conn_DataSource"].ConnectionString.ToString().Split(',')[1] + "" +
+            "&user="+ ConfigurationManager.ConnectionStrings["Conn_UserId"].ConnectionString.ToString() + "" +
+            "&dbpwd=" + ConfigurationManager.ConnectionStrings["Conn_Password"].ConnectionString.ToString() + "" +
+            "&db="+ ConfigurationManager.ConnectionStrings["Conn_InitialCatalog"].ConnectionString.ToString() + "";
         byte[] postData =Encoding.UTF8.GetBytes(data);
         Stream reqStream = request.GetRequestStream();
         reqStream.Write(postData, 0, postData.Length);
@@ -53,7 +56,7 @@ public class PythonHelper
 
     public string checkpwd(string username, string pwd)
     {
-        string serviceAddress = "http://47.101.212.49:8091/Checkpwd/";
+        string serviceAddress = "http://127.0.0.1:8090/Checkpwd/";
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(serviceAddress);
         request.Method = "POST";
         //request.ReadWriteTimeout = 5000;

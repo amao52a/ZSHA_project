@@ -55,7 +55,7 @@ public class Au_Users : IHttpHandler {
         int FId_i = int.Parse(context.Request.Form["id"]);
         StringBuilder strwhere_sb = new StringBuilder();
         StringBuilder strcount_sb = new StringBuilder();
-        strwhere_sb.Append("select au.id,au.UserName,au.PassWord,au.Unit_Id,au.Names,au.activate,au.Sorts,au.Level,au.F_id,aus.UnitName from Au_Users au left join Au_Units aus on au.Unit_Id=aus.id where 1=1");
+        strwhere_sb.Append("select au.id,au.UserName,au.PassWord,au.Unit_Id,au.Names,au.Activate,au.Sorts,au.Level,au.F_id,aus.UnitName from Au_Users au left join Au_Units aus on au.Unit_Id=aus.id where 1=1");
         strcount_sb.Append("select count(*) from Au_Users where 1=1");
         if (FId_i!=0){
             strwhere_sb.AppendFormat(" and au.F_id = {0}" , FId_i);

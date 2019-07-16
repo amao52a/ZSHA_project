@@ -189,29 +189,54 @@
             traditional: 'true',
             success: function (result) {
                 rs = jQuery.parseJSON(result)
-                var count=0
+                var count = 0
+                //本月增值税
+                for (var i = 0; i < rs[0].month.length;i++) {
+                    var m = rs[0].month[i]
+                    if (m.state == "false") {
+                        console.log(m.table + ":" + m.month+"没有查询到")
+                    } else if (m.state == "error") {
+                        console.log(m.table + ":" + m.month+"查询出错")
+                    }
+                }
+                //上年增值税
+                for (var i = 0; i < rs[1].lastmonth.length;i++) {
+                    var m = rs[1].lastmonth[i]
+                    if (m.state == "false") {
+                        console.log(m.table+":"+m.month+"没有查询到")
+                    }else if (m.state == "error") {
+                        console.log(m.table + ":" + m.month+"查询出错")
+                    }
+                }
                 //本年度的年报
-                for (var i = 0; i < rs[0].year.length;i++) {
-                    var y = rs[0].year[i]
-                    if (y.state=="false") {
+                for (var i = 0; i < rs[2].year.length;i++) {
+                    var y = rs[2].year[i]
+                    if (y.state == "false") {
                         //打开相应的填报页面
                         addTab(i + 1, y.table, y.year, $('#username').val());
                         count++;
+                    } else if (y.state=="error") {
+                        console.log(y.table + ":" + y.year+"查询出错")
                     }
                 }
                 //上年度的年报
-                for (var i = 0; i < rs[1].lastyear.length;i++) {
-                    var ly = rs[1].lastyear[i]
+                for (var i = 0; i < rs[3].lastyear.length;i++) {
+                    var ly = rs[3].lastyear[i]
                     if (ly.state=="false") {
                         //打开相应的填报页面
                         addTab((i + 1) * 10, ly.table, ly.year, $('#username').val());
                         count++;
+                    }else if (ly.state=="error") {
+                        console.log(ly.table + ":" + ly.year+"查询出错")
                     }
                 }
-                if (count > 0) {
-                    $("#tax").html("<span style='color:red'>请补充完成以下数据，便于结果更加精确，</span><span style='color:green'>您的查询号为：" + rs[2].numbers + "</span><button onclick='checkrs(\""+rs[2].numbers +"\")'>查看结果</button>");
+                if (rs[4].numbers == "error") {
+                    $("#tax").html("<span style='color:red'>接口调用失败，请稍后再试！</span>");
+                }
+                else if (count > 0) {
+                    $("#tax").html("<span style='color:red'>请补充完成以下数据，便于结果更加精确，</span><span style='color:green'>您的查询号为：" + rs[4].numbers + "</span><button onclick='checkrs(\""+rs[4].numbers +"\")'>查看结果</button>");
                 } else {
-                    $("#tax").html("<span style='color:green'>您的查询号为：" + rs[2].numbers + "</span><button onclick='checkrs(\""+rs[2].numbers +"\")'>查看结果</button>");
+                    $("#tax").html("<span style='color:green'>您的查询号为：" + rs[4].numbers + "</span><button onclick='checkrs(\""+rs[4].numbers +"\")'>查看结果</button>");
                 } 
                 $("#gettax").removeAttr("disabled");
             },error:function () {
@@ -257,23 +282,24 @@
         WdatePicker({ dateFmt: 'yyyy-MM', isShowToday: false, isShowClear: false });  
     }  
 
+    //所得税缺失数据补充
     function addTab(id,table,year,username){
         var url = "";
         var name = "";
         var style = {};
-        if (table == "A100000") {
+        if (table == "Ta020001") {
             url = "Du_A100000.aspx?year=" + year + "&companysnumbers=" + username + "";
             name = "中华人民共和国企业所得税年度纳税申报表（" + year + "年）"
             style = {
                 style:"width:100%;height:900px"
             }
-        } else if (table == "A104000") {
+        } else if (table == "Ta020003") {
             url = "Du_A104000.aspx?year=" + year + "&companysnumbers=" + username + "";
             name = "期间费用明细表（" + year + "年）"
             style = {
                 style:"width:100%;height:670px"
             }
-        } else if (table == "A105050") {
+        } else if (table == "Ta020002") {
             url = "Du_A105050.aspx?year=" + year + "&companysnumbers=" + username + "";
             name = "职工薪酬纳税调整明细表（" + year + "年）"
             style = {

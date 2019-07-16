@@ -81,7 +81,7 @@ public class Du_Industrys : IHttpHandler {
         }
         else
         {
-            string sql_str = "Update Industrys Set Areas_Numbers=@Areas_Numbers , Names=@Names,Numbers=@Numbers Where ID=@Id;";
+            string sql_str = "Update Industrys Set Areas_Numbers=@Areas_Numbers , Names=@Names,Numbers=@Numbers Where id=@Id;";
             SqlParameter[] parameters ={ new SqlParameter("@Id", id_str),
                 new SqlParameter("@Areas_Numbers", Areas_Numbers_str),
                 new SqlParameter("@Names", Names_str),
@@ -101,7 +101,7 @@ public class Du_Industrys : IHttpHandler {
     public void Industrysremove(HttpContext context)
     {
         string id_str = context.Request.Form["id"];
-        string sql_str = "delete Industrys Where ID="+id_str+";";
+        string sql_str = "delete Industrys Where id="+id_str+";";
         int count_i=SqlHelper.ExecuteNonQuery(sql_str);
         if (count_i>0)
         {

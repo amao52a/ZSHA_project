@@ -105,7 +105,7 @@ public class Du_Areas : IHttpHandler {
         }
         else
         {
-            string sql_str = "Update Areas Set F_Numbers=@F_Numbers , Names=@Names,Numbers=@Numbers Where ID=@Id;";
+            string sql_str = "Update Areas Set F_Numbers=@F_Numbers , Names=@Names,Numbers=@Numbers Where id=@Id;";
             SqlParameter[] parameters ={ new SqlParameter("@Id", id_str),
                 new SqlParameter("@F_Numbers", F_Numbers_str),
                 new SqlParameter("@Names", Names_str),
@@ -126,7 +126,7 @@ public class Du_Areas : IHttpHandler {
     public void Areasremove(HttpContext context)
     {
         string id_str = context.Request.Form["id"];
-        string sql_str = "delete Areas Where ID="+id_str+";";
+        string sql_str = "delete Areas Where id="+id_str+";";
         int count_i=SqlHelper.ExecuteNonQuery(sql_str);
         if (count_i>0)
         {

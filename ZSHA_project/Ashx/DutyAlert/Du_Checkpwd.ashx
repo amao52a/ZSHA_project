@@ -14,8 +14,16 @@ public class Du_Checkpwd : IHttpHandler {
         string username_str=context.Request.Form["username"];
         string password_str=context.Request.Form["password"];
         PythonHelper ph = new PythonHelper();
-        json_str=ph.checkpwd(username_str, password_str);
-        context.Response.Write(json_str);
+        try
+        {
+            json_str=ph.checkpwd(username_str, password_str);
+            context.Response.Write(json_str);
+        }
+        catch
+        {
+            context.Response.Write("接口调用失败，请稍后再试！");
+        }
+
     }
 
     public bool IsReusable {
